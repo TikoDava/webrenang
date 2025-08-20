@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Absensi Renang</title>
+  <style>
+    body { font-family: Arial; max-width: 400px; margin: auto; }
+    input, button { margin: 5px; padding: 8px; width: 95%; }
+  </style>
+</head>
+<body>
+  <h2>🏊 Absensi Renang</h2>
+
+  <div id="auth">
+    <h3>Login</h3>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p>Belum punya akun? <a href="#" onclick="showRegister()">Daftar</a></p>
+  </div>
+
+  <div id="register" style="display:none;">
+    <h3>Daftar Akun Baru</h3>
+    <input type="text" id="newUser" placeholder="Username">
+    <input type="password" id="newPass" placeholder="Password">
+    <button onclick="register()">Daftar</button>
+    <p><a href="#" onclick="showLogin()">Kembali ke Login</a></p>
+  </div>
+
+  <div id="absensi" style="display:none;">
+    <h3>Form Absensi</h3>
+    <input type="text" id="nama" placeholder="Nama">
+    <input type="date" id="tanggal">
+    <button onclick="absen()">Absen</button>
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbws0G0Wm8CEhIG9hN64wV2WJYZumafwzFeOlPluk24nSs1UVsYRrDSRTz9EbW5YXdzj/exec";
+
+    function showRegister(){
+      document.getElementById("auth").style.display="none";
+      document.getElementById("register").style.display="block";
+    }
+    function showLogin(){
+      document.getElementById("auth").style.display="block";
+      document.getElementById("register").style.display="none";
+    }
+
+    async function login(){
+      let u = document.getElementById("username").value;
+      let p = document.getElementById("password").value;
+
+      let res = await fetch(API_URL+"?action=login", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({username:u,password:p})
+      });
+      let data = await res.json();
+
+      if(data.status=="success"){
+        document.getElementById("auth").style.display="none";
+        document.getElementById("absensi").style.display="block";
+      } else {
+        alert(data.message);
+      }
+    }
+
+    async function register(){
+      let u = document.getElementById("newUser").value;
+      let p = document.getElementById("newPass").value;
+
+      let res = await fetch(API_URL+"?action=register", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({username:u,password:p})
+      });
+      let data = await res.json();
+      alert(data.message);
+      if(data.status=="success") showLogin();
+    }
+
+    async function absen(){
+      let nama = document.getElementById("nama").value;
+      let tanggal = document.getElementById("tanggal").value;
+
+      let res = await fetch(API_URL+"?action=absen", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({nama,tanggal})
+      });
+      let data = await res.json();
+      document.getElementById("msg").innerText = data.message;
+    }
+  </script>
+</body>
+</html>
